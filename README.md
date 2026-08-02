@@ -2,7 +2,7 @@
 
 **Applied NLP / NER Technical Task — Project Documentation**
 
-Author: Elnar Babayev
+Author: Maarif Sariyev
 
 ---
 
@@ -189,3 +189,70 @@ Adding real data and real-structure synthetic samples raised JOB F1 from **0.22 
 ## 8. Summary
 
 Starting from a messy 100-row starter set, the project produced a balanced 8-label NER dataset and a fine-tuned model reaching **0.84 F1 on real, hand-annotated news text**. The central lesson — surfaced by building an honest benchmark — was that **synthetic data must match real-world structure, not just supply volume**. The iterative diagnose-fix-retrain loop, driven by per-label analysis and a real benchmark, turned a JOB F1 of 0.08 into 0.765 and a memorization-inflated 0.93 into a trustworthy 0.84.
+
+
+
+---
+
+# 🤗 Trained Model
+
+The final fine-tuned model has been published on Hugging Face.
+
+**Repository**
+
+https://huggingface.co/MaarifSariyev/ner-model
+
+### Load the model
+
+```python
+from transformers import AutoTokenizer, AutoModelForTokenClassification
+
+tokenizer = AutoTokenizer.from_pretrained("MaarifSariyev/ner-model")
+model = AutoModelForTokenClassification.from_pretrained("MaarifSariyev/ner-model")
+```
+
+### Example inference
+
+```python
+from transformers import pipeline
+
+ner = pipeline(
+    "token-classification",
+    model=model,
+    tokenizer=tokenizer,
+    aggregation_strategy="simple"
+)
+
+text = (
+    "Senior Machine Learning Engineer John Smith joined Microsoft "
+    "on March 5, 2024 with a $120,000 salary."
+)
+
+predictions = ner(text)
+
+for entity in predictions:
+    print(entity)
+```
+
+The model predicts entities using the following schema:
+
+- PERSON
+- ORGANIZATION
+- LOCATION
+- JOB
+- PRODUCT
+- WORKOFART
+- TIMEDATE
+- AMOUNT
+
+---
+
+## Final Performance (Real Benchmark)
+
+| Metric | Score |
+|---------|------:|
+| Precision | **0.806** |
+| Recall | **0.875** |
+| F1 | **0.839** |
+
+The model was evaluated on a **held-out manually annotated benchmark** that was never used during training, providing a realistic estimate of real-world performance.
